@@ -41,6 +41,7 @@ public class CS5811TwitterDataGen {
 
 		//Josh's Prioritized search
 		Prioritized<String> joshssearch = new Prioritized<String>();
+		int dist = joshssearch.distance("1", "2", twitterUsers);
 
 		//Ankita's searches
 
