@@ -1,3 +1,4 @@
+import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -16,6 +17,8 @@ import org.jgrapht.graph.DefaultEdge;
  */
 public class Greedy<VertexType> {
 
+	BigInteger nodesGen = new BigInteger("0");
+	
 	/**
 	 * Given two user IDs, find their degree of separation using greedy heuristic.
 	 */
@@ -33,6 +36,7 @@ public class Greedy<VertexType> {
 		// Until (Case) 'y' is adjacent or (Case) greedy heuristic gives node with no following or (Case) path too long
 		VertexType id = x;
 		while( true ){
+			nodesGen = nodesGen.add(BigInteger.ONE);
 			path.add(id);
 
 			// Case: path length reached 325
@@ -71,6 +75,7 @@ public class Greedy<VertexType> {
 			System.out.printf("Initial Max = (%s, %d)\n", maxID, max);
 
 			while( iterator.hasNext() ){
+				nodesGen = nodesGen.add(BigInteger.ONE);
 				int k = 0;
 				if( g.containsVertex(e) )
 					k = g.outDegreeOf(e);

@@ -1,5 +1,3 @@
-
-
 import org.jgrapht.graph.AsUnweightedDirectedGraph;
 import org.jgrapht.graph.DefaultDirectedGraph;
 import org.jgrapht.graph.DefaultEdge;
@@ -14,8 +12,8 @@ public class CS5811TwitterDataGen {
 		//GENERATE DATA////////////////////////////////////////////////
 
 
-		int numberUsers = 10000;
-		int numberFollowingConstant = 100;
+		int numberUsers = 100;
+		int numberFollowingConstant = 10;
 
 		AsUnweightedDirectedGraph<String, DefaultEdge> twitterUsers;
 		twitterUsers = new AsUnweightedDirectedGraph<String, DefaultEdge>
@@ -39,7 +37,14 @@ public class CS5811TwitterDataGen {
 
 		//Gage's Greedy search
 		Greedy<String> gagessearch = new Greedy<String>();
-		gagessearch.degSep("1", "2", twitterUsers);
+		long start = System.nanoTime();
+		gagessearch.degSep("1", "2", twitterUsers); // Degrees of separation
+		long end= System.nanoTime();
+		long totalNano = end-start;
+		double totalSec = (double)totalNano / 1000000000.0;
+		System.out.printf("Nodes generated = %s\n", gagessearch.nodesGen.toString());
+		System.out.printf("Total time = %f\n", totalSec);
+		
 
 		//Josh's Prioritized search
 		Prioritized<String> joshssearch = new Prioritized<String>();
@@ -47,7 +52,7 @@ public class CS5811TwitterDataGen {
 
 		//Ankita's searches
 
-		System.out.println( twitterUsers.toString());
+		//System.out.println( twitterUsers.toString());
 	}
 
 }
