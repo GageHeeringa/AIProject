@@ -37,14 +37,21 @@ public class CS5811TwitterDataGen {
 
 		//Gage's Greedy search
 		Greedy<String> gagessearch = new Greedy<String>();
-		gagessearch.degSep("1", "2", twitterUsers);
+		long start = System.nanoTime();
+		gagessearch.degSep("1", "2", twitterUsers); // Degrees of separation
+		long end= System.nanoTime();
+		long totalNano = end-start;
+		double totalSec = (double)totalNano / 1000000000.0;
+		System.out.printf("Nodes generated = %s\n", gagessearch.nodesGen.toString());
+		System.out.printf("Total time = %f\n", totalSec);
+		
 
 		//Josh's Prioritized search
-		Prioritized<String> joshssearch = new Prioritized<String>();
+		//Prioritized<String> joshssearch = new Prioritized<String>();
 
 		//Ankita's searches
 
-		System.out.println( twitterUsers.toString());
+		//System.out.println( twitterUsers.toString());
 	}
 
 }
