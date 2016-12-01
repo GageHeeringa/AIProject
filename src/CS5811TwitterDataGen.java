@@ -1,3 +1,5 @@
+
+
 import org.jgrapht.graph.AsUnweightedDirectedGraph;
 import org.jgrapht.graph.DefaultDirectedGraph;
 import org.jgrapht.graph.DefaultEdge;
@@ -12,8 +14,8 @@ public class CS5811TwitterDataGen {
 		//GENERATE DATA////////////////////////////////////////////////
 
 
-		int numberUsers = 100;
-		int numberFollowingConstant = 10;
+		int numberUsers = 10000;
+		int numberFollowingConstant = 100;
 
 		AsUnweightedDirectedGraph<String, DefaultEdge> twitterUsers;
 		twitterUsers = new AsUnweightedDirectedGraph<String, DefaultEdge>
