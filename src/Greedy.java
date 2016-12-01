@@ -87,9 +87,10 @@ public class Greedy<VertexType> {
 				}
 
 				// avoid revisiting IDs
-				do{
+				e = iterator.next();
+				while( path.contains(e)){
 					e = iterator.next();
-				} while( path.contains(e));
+				}
 			}
 
 			id = maxID;
