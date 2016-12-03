@@ -23,8 +23,14 @@ public class Prioritized<VertexType> {
 
 		startUserQueue.add(startUser);
 		endUserQueue.add(endUser);
+		startUserExplored.put(startUser, Integer.valueOf(1));
+		endUserExplored.put(endUser, Integer.valueOf(1));
+		
+		if(endUserExplored.contains(startUser))
+			return numSteps;
 		
 		while(numSteps < 300){
+		    
 		    numSteps += 1;
 		    LinkedList<VertexType> nextQueue = new LinkedList<VertexType>();
 		    
@@ -33,15 +39,14 @@ public class Prioritized<VertexType> {
 		    	if(endUserExplored.containsKey(expand)){
 		    		return numSteps;
 		    	}
-		    	if(!startUserExplored.containsKey(expand)){
-		    		startUserExplored.put(expand, Integer.valueOf(1));
-		    		for(DefaultEdge toFollowEdge : userDB.outgoingEdgesOf(expand)){
-		    			VertexType toFollow = userDB.getEdgeTarget(toFollowEdge);
-		    			if(!startUserExplored.containsKey(toFollow)){
-		    				nextQueue.add(toFollow);
-		    			}
-		    		}
-		    	}
+		    	for(DefaultEdge toFollowEdge : userDB.outgoingEdgesOf(expand)){
+		    		VertexType toFollow = userDB.getEdgeTarget(toFollowEdge);
+		   			if(!startUserExplored.containsKey(toFollow)){
+			    		startUserExplored.put(toFollow, Integer.valueOf(1));
+	    				nextQueue.add(toFollow);
+	    			}
+		   		}
+		    	
 		    }
 		    //TODO: reorder
 		    startUserQueue = nextQueue;
@@ -55,21 +60,19 @@ public class Prioritized<VertexType> {
 		    	if(startUserExplored.containsKey(expand)){
 		    		return numSteps;
 		    	}
-		    	if(!endUserExplored.containsKey(expand)){
-		    		endUserExplored.put(expand, Integer.valueOf(1));
-		    		for(DefaultEdge toFollowEdge : userDB.outgoingEdgesOf(expand)){
-		    			VertexType toFollow = userDB.getEdgeTarget(toFollowEdge);
-		    			if(!endUserExplored.containsKey(toFollow)){
-		    				nextQueue.add(toFollow);
-		    			}
-		    		}
-		    	}
-		    }
+		    	for(DefaultEdge toFollowEdge : userDB.incomingEdgesOf(expand)){
+		    		VertexType toFollow = userDB.getEdgeSource(toFollowEdge);
+		    		if(!endUserExplored.containsKey(toFollow)){
+			    		endUserExplored.put(toFollow, Integer.valueOf(1));
+		   				nextQueue.add(toFollow);
+	    			}
+	    		}
+	    	}
 		    //TODO: reorder
 		    endUserQueue = nextQueue;
 		}
 		
-		return numSteps;
+		return -1;
 	}
 	
 }
