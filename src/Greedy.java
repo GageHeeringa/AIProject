@@ -23,7 +23,7 @@ public class Greedy<VertexType> {
 	 * Given two user IDs, find their degree of separation using greedy heuristic.
 	 */
 	int degSep( VertexType x, VertexType y, AsUnweightedDirectedGraph<VertexType, DefaultEdge> g){
-		System.out.println("X = " + x + "\nY = " + y);
+		//System.out.println("X = " + x + "\nY = " + y);
 		if(x.equals(y)){
 			if( g.containsVertex(x) ) // Make sure they're in the graph
 				return 0;
@@ -41,11 +41,11 @@ public class Greedy<VertexType> {
 
 			// Case: path length reached 325
 			if( path.size() > 325){
-				System.out.printf("--- Case: path length exceeded 325\n");
+				//System.out.printf("--- Case: path length exceeded 325\n");
 				return -1;
 			}
 
-			System.out.printf("\nPath = %s\n", path.toString());
+			//System.out.printf("\nPath = %s\n", path.toString());
 			DefaultEdge[] followingEdges = new DefaultEdge[g.outDegreeOf(id)];
 			g.outgoingEdgesOf(id).toArray(followingEdges);
 			Set<VertexType> following = new HashSet<VertexType>();
@@ -54,13 +54,13 @@ public class Greedy<VertexType> {
 
 			// Case: greedy heuristic gives node with no following
 			if( following == null || following.size() == 0){
-				System.out.printf("--- Case: greedy heuristic gives node with no following\n");
+				//System.out.printf("--- Case: greedy heuristic gives node with no following\n");
 				return -1;
 			}
 
 			// Case: 'y' is adjacent
 			if( following.contains(y) ){
-				System.out.printf("--- Case: 'y' is adjacent\n");
+				//System.out.printf("--- Case: 'y' is adjacent\n");
 				//path.add(y);
 				return path.size();
 			}
@@ -72,7 +72,7 @@ public class Greedy<VertexType> {
 			if( g.containsVertex(e) )
 				max = g.outDegreeOf(e);
 			VertexType maxID = e;
-			System.out.printf("Initial Max = (%s, %d)\n", maxID, max);
+			//System.out.printf("Initial Max = (%s, %d)\n", maxID, max);
 
 			while( iterator.hasNext() ){
 				nodesGen = nodesGen.add(BigInteger.ONE);
@@ -83,12 +83,12 @@ public class Greedy<VertexType> {
 				if(k > max){
 					max = k;
 					maxID = e;
-					System.out.printf("New Max = (%s, %d)\n", maxID, max);
+					//System.out.printf("New Max = (%s, %d)\n", maxID, max);
 				}
 
 				// avoid revisiting IDs
 				e = iterator.next();
-				while( path.contains(e)){
+				while( path.contains(e) && iterator.hasNext()){//TODO: this may not be right
 					e = iterator.next();
 				}
 			}
