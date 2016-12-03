@@ -93,7 +93,7 @@ public class CS5811TwitterDataGen {
 				
 		
 		System.out.println("Done!");
-		//System.out.println( twitterUsers.toString());
+
 	}
 
 }
