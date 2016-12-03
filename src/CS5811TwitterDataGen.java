@@ -1,3 +1,5 @@
+import java.util.LinkedList;
+
 import org.jgrapht.graph.AsUnweightedDirectedGraph;
 import org.jgrapht.graph.DefaultDirectedGraph;
 import org.jgrapht.graph.DefaultEdge;
@@ -35,23 +37,62 @@ public class CS5811TwitterDataGen {
 
 		//TEST IMPLEMENTATION//////////////////////////////////////////
 
-		//Gage's Greedy search
 		Greedy<String> gagessearch = new Greedy<String>();
-		long start = System.nanoTime();
-		gagessearch.degSep("1", "2", twitterUsers); // Degrees of separation
-		long end= System.nanoTime();
-		long totalNano = end-start;
-		double totalSec = (double)totalNano / 1000000000.0;
-		System.out.printf("Nodes generated = %s\n", gagessearch.nodesGen.toString());
-		System.out.printf("Total time = %f\n", totalSec);
-		
-
-		//Josh's Prioritized search
 		Prioritized<String> joshssearch = new Prioritized<String>();
-		int dist = joshssearch.distance("1", "2", twitterUsers);
+		Bidrectional_BFS<String> ankitassearch = new Bidrectional_BFS<String>();
+		
+		int timeRec;
+		LinkedList<Integer> gageTimes, joshTimes, ankitaTimes;
+		gageTimes = new LinkedList<Integer>();
+		joshTimes = new LinkedList<Integer>();
+		ankitaTimes = new LinkedList<Integer>();
+		
+		
+		for(int i = 0; i < numberUsers; i++){
+			for(int j = 0; j < numberUsers; j++){
+				if(i != j){
+					String x, y;
+					x = Integer.toString(i);
+					y = Integer.toString(j);
+					
+					timeRec = (int) System.nanoTime();
+					int gageDist = gagessearch.degSep(x, y, twitterUsers); // Degrees of separation
+					gageTimes.add(Integer.valueOf((int) (System.nanoTime()-timeRec)));
 
-		//Ankita's searches
+					timeRec = (int) System.nanoTime();
+					int joshDist = joshssearch.distance(x, y, twitterUsers); // Degrees of separation
+					joshTimes.add(Integer.valueOf((int) (System.nanoTime()-timeRec)));
 
+					timeRec = (int) System.nanoTime();
+					int ankitaDist = ankitassearch.FindDegree(x, y, twitterUsers); // Degrees of separation
+					ankitaTimes.add(Integer.valueOf((int) (System.nanoTime()-timeRec)));
+
+					String toPrint;
+					if(gageDist != joshDist){
+						toPrint = "Distance mismatch between Gage(" + Integer.toString(gageDist);
+						toPrint = toPrint + ") and Josh(" + Integer.toString(joshDist);
+						toPrint = toPrint + ") for inputs " + x + ", " + y;
+						System.out.println(toPrint);
+					}
+					if(gageDist != ankitaDist){
+						toPrint = "Distance mismatch between Gage(" + Integer.toString(gageDist);
+						toPrint = toPrint + ") and Ankita(" + Integer.toString(ankitaDist);
+						toPrint = toPrint + ") for inputs " + x + ", " + y;
+						System.out.println(toPrint);
+					}
+					if(ankitaDist != joshDist){
+						toPrint = "Distance mismatch between Ankita(" + Integer.toString(ankitaDist);
+						toPrint = toPrint + ") and Josh(" + Integer.toString(joshDist);
+						toPrint = toPrint + ") for inputs " + x + ", " + y;
+						System.out.println(toPrint);
+					}
+					
+				}
+			}
+		}
+				
+		
+		System.out.println("Done!");
 		//System.out.println( twitterUsers.toString());
 	}
 
