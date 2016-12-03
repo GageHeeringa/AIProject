@@ -28,6 +28,7 @@ public class Bidrectional_BFS<VertexType> {
 
 		source_list.add(Source);
 		dest_list.add(Destination);
+		while(dest_found!=1)
 		finduser(g);
 		
 		return Degree_of_separation;
@@ -60,14 +61,14 @@ public class Bidrectional_BFS<VertexType> {
 			if (fromSource == 1) {
 				if (dest_list.contains(element)) {
 					//System.out.println("Destination Found");
-					Degree_of_separation++;
+					Degree_of_separation=source_list.size()+dest_list.indexOf(element)+1;
 					dest_found = 1;
 					break;
 				}
 			} else {
 				if (source_list.contains(element)) {
 					//System.out.println("Destination Found");
-					Degree_of_separation++;
+					Degree_of_separation=dest_list.size()+source_list.indexOf(element)+1;
 					dest_found = 1;
 					break;
 				}
@@ -110,7 +111,7 @@ public class Bidrectional_BFS<VertexType> {
 				dest_list.add((VertexType) itr.next());
 				fromSource = 1;
 			}
-			Degree_of_separation++;
+			
 		}
 	}
 }
