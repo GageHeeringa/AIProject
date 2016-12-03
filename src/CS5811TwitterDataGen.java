@@ -50,7 +50,16 @@ public class CS5811TwitterDataGen {
 		Prioritized<String> joshssearch = new Prioritized<String>();
 		int dist = joshssearch.distance("1", "2", twitterUsers);
 
-		//Ankita's searches
+		//Ankitha's searches
+		
+		Bidrectional_BFS<String> anksearch = new Bidrectional_BFS<String>();
+		long start = System.nanoTime();
+		anksearch.FindDegree("10", "79", twitterUsers); // Degrees of separation
+		long end= System.nanoTime();
+		long totalNano = end-start;
+		double totalSec = (double)totalNano / 1000000000.0;
+		//System.out.printf("Nodes generated = %s\n", gssearch.nodesGen.toString());
+		System.out.printf("Total time = %f\n", totalSec);
 
 		//System.out.println( twitterUsers.toString());
 	}
