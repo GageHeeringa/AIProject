@@ -2,6 +2,7 @@ import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.Set;
 
 import org.jgrapht.graph.AsUnweightedDirectedGraph;
@@ -16,79 +17,58 @@ import org.jgrapht.graph.DefaultEdge;
  */
 public class Greedy<VertexType> {
 
-	BigInteger nodesGen = new BigInteger("0");
 	
 	/**
 	 * Given two user IDs, find their degree of separation using greedy heuristic.
 	 */
 	int degSep( VertexType x, VertexType y, AsUnweightedDirectedGraph<VertexType, DefaultEdge> g){
+		LinkedList<VertexType> path;
+		HashSet<VertexType> touched;
 		//System.out.println("X = " + x + "\nY = " + y);
-		if(x.equals(y)){
-			if( g.containsVertex(x) ) // Make sure they're in the graph
-				return 0;
-			else
-				return -1;
-		}
-
-		ArrayList<VertexType> path = new ArrayList<VertexType>();
+		if(x.equals(y))
+			return 0;
+		
+		path = new LinkedList<VertexType>();
+		touched = new HashSet<VertexType>();
 
 		// Until (Case) 'y' is adjacent or (Case) greedy heuristic gives node with no following or (Case) path too long
 		VertexType id = x;
 		while( true ){
-			nodesGen = nodesGen.add(BigInteger.ONE);
-			path.add(id);
+			ArrayList<VertexType> following;
+			int max;
 
-			// Case: path length reached 325
-			if( path.size() > 325){
-				//System.out.printf("--- Case: path length exceeded 325\n");
+			if(id != null)
+				touched.add(id);
+			
+			if(id != null){
+				path.add(id);
+			}else if(id == null && !path.isEmpty()){
+				id = path.removeLast();
+				continue;
+			}else{
 				return -1;
 			}
 
-			//System.out.printf("\nPath = %s\n", path.toString());
-			DefaultEdge[] followingEdges = new DefaultEdge[g.outDegreeOf(id)];
-			g.outgoingEdgesOf(id).toArray(followingEdges);
-			Set<VertexType> following = new HashSet<VertexType>();
-			for(int i = 0; i < followingEdges.length; i++)
-				following.add(g.getEdgeTarget(followingEdges[i]));
-
-			// Case: greedy heuristic gives node with no following
-			if( following == null || following.size() == 0){
-				//System.out.printf("--- Case: greedy heuristic gives node with no following\n");
-				return -1;
+			following = new ArrayList<VertexType>();
+			for(DefaultEdge edge : g.outgoingEdgesOf(id)){
+				VertexType v = g.getEdgeTarget(edge);
+				if(!touched.contains(v)){
+					following.add(v);
+				}
 			}
 
 			// Case: 'y' is adjacent
-			if( following.contains(y) ){
-				//System.out.printf("--- Case: 'y' is adjacent\n");
-				//path.add(y);
-				return path.size();
-			}
+			if( following.contains(y) )
+				return path.size()+1;
 
 			// Greedy heuristic ( max # followings )
-			Iterator< VertexType > iterator = following.iterator();
-			VertexType e = iterator.next();
-			int max = 0;
-			if( g.containsVertex(e) )
-				max = g.outDegreeOf(e);
-			VertexType maxID = e;
-			//System.out.printf("Initial Max = (%s, %d)\n", maxID, max);
+			VertexType maxID = null;
+			max = -1;
 
-			while( iterator.hasNext() ){
-				nodesGen = nodesGen.add(BigInteger.ONE);
-				int k = 0;
-				if( g.containsVertex(e) )
-					k = g.outDegreeOf(e);
-
-				if(k > max){
-					max = k;
+			for(VertexType e : following){
+				if(g.outDegreeOf(e) > max){
+					max = g.outDegreeOf(e);
 					maxID = e;
-					//System.out.printf("New Max = (%s, %d)\n", maxID, max);
-				}
-
-				// avoid revisiting IDs
-				e = iterator.next();
-				while( path.contains(e) && iterator.hasNext()){//TODO: this may not be right
-					e = iterator.next();
 				}
 			}
 
@@ -98,47 +78,3 @@ public class Greedy<VertexType> {
 
 }
 
-
-///**
-// * Represent a social network.
-// * 
-// * @author Gage Heeringa
-// */
-//class Graph {
-//
-//	HashMap<String, Set<String>> _vertices; 
-//
-//	/**
-//	 * Construct a new, empty graph.
-//	 */
-//	Graph(){
-//		_vertices = new HashMap<String, Set<String>>();
-//	}
-//
-//	/**
-//	 * Add vertex to graph.
-//	 */
-//	void add(String s, Set<String> list){
-//		if(!_vertices.containsKey(s)){
-//			_vertices.put(s, list);
-//		}
-//	}
-//
-//	public String toString(){
-//		String s = "Vertices:\n";
-//
-//		Iterator< Entry<String, Set<String>> > iterator = _vertices.entrySet().iterator();
-//		while(iterator.hasNext()) {
-//			Entry<String, Set<String>> e = iterator.next();
-//			s += e.getKey().toString() + " follows:\n[";
-//
-//			for(String b : e.getValue()){
-//				s += b.toString() + ", ";
-//			}
-//
-//			s += "]\n\n";
-//		}
-//
-//		return s;
-//	}
-//}
