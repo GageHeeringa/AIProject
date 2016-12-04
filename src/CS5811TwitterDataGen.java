@@ -14,8 +14,8 @@ public class CS5811TwitterDataGen {
 		//GENERATE DATA////////////////////////////////////////////////
 
 
-		int numberUsers = 100;
-		int numberFollowingConstant = 10;
+		int numberUsers = 30000000;
+		int numberFollowingConstant = (int) Math.log10(numberUsers);
 
 		AsUnweightedDirectedGraph<String, DefaultEdge> twitterUsers;
 		twitterUsers = new AsUnweightedDirectedGraph<String, DefaultEdge>

@@ -95,7 +95,7 @@ public class Bidrectional_BFS<VertexType> {
 					max_index = i;
 				}
 			}
-			Iterator itr = following.iterator();
+			Iterator<VertexType> itr = following.iterator();
 			int i = 0;
 			while (itr.hasNext()) {
 				if (i == max_index)
@@ -104,11 +104,11 @@ public class Bidrectional_BFS<VertexType> {
 			}
 
 			if (fromSource == 1) {
-				source_list.add((VertexType) itr.next());
+				source_list.add( itr.next());
 				fromSource = 0;
 
 			} else {
-				dest_list.add((VertexType) itr.next());
+				dest_list.add( itr.next());
 				fromSource = 1;
 			}
 			

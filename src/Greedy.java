@@ -2,7 +2,6 @@ import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Iterator;
-import java.util.Scanner;
 import java.util.Set;
 
 import org.jgrapht.graph.AsUnweightedDirectedGraph;

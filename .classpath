@@ -5,9 +5,7 @@
 	<classpathentry kind="lib" path="antlr4-runtime-4.5.3.jar"/>
 	<classpathentry kind="lib" path="jgraph-5.13.0.0.jar"/>
 	<classpathentry kind="lib" path="jgrapht-core-1.0.0.jar"/>
-	<classpathentry kind="lib" path="jgrapht-demo-1.0.0.jar"/>
 	<classpathentry kind="lib" path="jgrapht-ext-1.0.0-uber.jar"/>
 	<classpathentry kind="lib" path="jgrapht-ext-1.0.0.jar"/>
-	<classpathentry kind="lib" path="jgraphx-2.0.0.1.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
