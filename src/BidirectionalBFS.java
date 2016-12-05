@@ -5,9 +5,9 @@ import org.jgrapht.graph.AsUnweightedDirectedGraph;
 import org.jgrapht.graph.DefaultEdge;
 
 
-public class Prioritized<VertexType> {
+public class BidirectionalBFS<VertexType> implements GraphDepthSearch<VertexType>{
 	
-	int distance(VertexType startUser, VertexType endUser, 
+	public int distance(VertexType startUser, VertexType endUser, 
 				AsUnweightedDirectedGraph<VertexType, DefaultEdge> userDB){
 		
 		int numSteps = 0;
@@ -26,10 +26,8 @@ public class Prioritized<VertexType> {
 		startUserExplored.put(startUser, Integer.valueOf(1));
 		endUserExplored.put(endUser, Integer.valueOf(1));
 		
-		if(endUserExplored.contains(startUser))
-			return numSteps;
 		
-		while(numSteps < 300){
+		while(numSteps < userDB.vertexSet().size()){
 		    
 		    numSteps += 1;
 		    LinkedList<VertexType> nextQueue = new LinkedList<VertexType>();
@@ -48,7 +46,6 @@ public class Prioritized<VertexType> {
 		   		}
 		    	
 		    }
-		    //TODO: reorder
 		    startUserQueue = nextQueue;
 			
 
@@ -68,11 +65,15 @@ public class Prioritized<VertexType> {
 	    			}
 	    		}
 	    	}
-		    //TODO: reorder
 		    endUserQueue = nextQueue;
 		}
 		
 		return -1;
+	}
+
+	@Override
+	public String name() {
+		return "Bidirectional BFS";
 	}
 	
 }

@@ -1,9 +1,6 @@
-import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.LinkedList;
-import java.util.Set;
 
 import org.jgrapht.graph.AsUnweightedDirectedGraph;
 import org.jgrapht.graph.DefaultEdge;
@@ -15,16 +12,16 @@ import org.jgrapht.graph.DefaultEdge;
  * @author Gage Heeringa
  * @author Josh Marshall
  */
-public class Greedy<VertexType> {
+public class GreedyDFS<VertexType> implements GraphDepthSearch<VertexType>{
 
-	
+
 	/**
 	 * Given two user IDs, find their degree of separation using greedy heuristic.
 	 */
-	int degSep( VertexType x, VertexType y, AsUnweightedDirectedGraph<VertexType, DefaultEdge> g){
+	public int distance( VertexType x, VertexType y, AsUnweightedDirectedGraph<VertexType, DefaultEdge> g){
 		LinkedList<VertexType> path;
 		HashSet<VertexType> touched;
-		//System.out.println("X = " + x + "\nY = " + y);
+		
 		if(x.equals(y))
 			return 0;
 		
@@ -37,18 +34,6 @@ public class Greedy<VertexType> {
 			ArrayList<VertexType> following;
 			int max;
 
-			if(id != null)
-				touched.add(id);
-			
-			if(id != null){
-				path.add(id);
-			}else if(id == null && !path.isEmpty()){
-				id = path.removeLast();
-				continue;
-			}else{
-				return -1;
-			}
-
 			following = new ArrayList<VertexType>();
 			for(DefaultEdge edge : g.outgoingEdgesOf(id)){
 				VertexType v = g.getEdgeTarget(edge);
@@ -57,23 +42,35 @@ public class Greedy<VertexType> {
 				}
 			}
 
-			// Case: 'y' is adjacent
 			if( following.contains(y) )
 				return path.size()+1;
 
 			// Greedy heuristic ( max # followings )
-			VertexType maxID = null;
 			max = -1;
-
+			id = null;
+			
 			for(VertexType e : following){
 				if(g.outDegreeOf(e) > max){
 					max = g.outDegreeOf(e);
-					maxID = e;
+					id = e;
 				}
 			}
-
-			id = maxID;
+			
+			if(id != null){
+				path.add(id);
+				touched.add(id);
+			}else if(id == null && !path.isEmpty()){
+				id = path.removeLast();
+				continue;
+			}else{
+				return -1;
+			}
 		}
+	}
+
+	@Override
+	public String name() {
+		return "Greedy DFS";
 	}
 
 }

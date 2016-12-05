@@ -1,3 +1,4 @@
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.Collections;
 
@@ -9,11 +10,9 @@ public class CS5811TwitterDataGen {
 
 	public static void main(String[] args) {
 
-		System.out.println("Starting");
-
 		// GENERATE DATA////////////////////////////////////////////////
 
-		int numberUsers = 1000;
+		int numberUsers = 100;
 		int numberFollowingConstant = (int) Math.sqrt(numberUsers);
 
 		AsUnweightedDirectedGraph<Integer, DefaultEdge> twitterUsers;
@@ -36,57 +35,37 @@ public class CS5811TwitterDataGen {
 
 		// TEST IMPLEMENTATION//////////////////////////////////////////
 
-		Greedy<Integer> gagessearch = new Greedy<Integer>();
-		Prioritized<Integer> joshssearch = new Prioritized<Integer>();
+		GraphDepthSearch searches[] = {new DFS<Integer>(), new BFS<Integer>(), new GreedyDFS<Integer>(),
+				new GreedyBFS<Integer>(), new BidirectionalDFS<Integer>(), new BidirectionalBFS<Integer>(),
+				new GreedyBidirectionalDFS<Integer>(), new GreedyBidirectionalBFS<Integer>()};
 
-		int timeRec;
-		LinkedList<Integer> gageTimes, joshTimes;
-		gageTimes = new LinkedList<Integer>();
-		joshTimes = new LinkedList<Integer>();
+		ArrayList<LinkedList<Integer>> times = new ArrayList<LinkedList<Integer>>();
+		for(int i = 0; i < searches.length; i++)
+			times.add(new LinkedList<Integer>());
+
+		System.out.println("Starting");
 
 		for (int i = 0; i < numberUsers; i++) {
 			for (int j = 0; j < numberUsers; j++) {
 				if (i != j) {
 
-					// System.out.print(">");
-					timeRec = (int) System.nanoTime();
-					int gageDist = gagessearch.degSep(i, j, twitterUsers); // Degrees
-																			// of
-																			// separation
-					gageTimes
-							.add(Integer.valueOf((int) (System.nanoTime() - timeRec)));
-
-					// System.out.print("1");
-					timeRec = (int) System.nanoTime();
-					int joshDist = joshssearch.distance(i, j, twitterUsers); // Degrees
-																				// of
-																				// separation
-					joshTimes
-							.add(Integer.valueOf((int) (System.nanoTime() - timeRec)));
-
-					// System.out.println("3");
-					boolean debug = true;
-					if (debug) {
-						String toPrint;
-						if (gageDist < joshDist) {
-							toPrint = "Distance mismatch between Gage("
-									+ Integer.toString(gageDist);
-							toPrint = toPrint + ") and Josh("
-									+ Integer.toString(joshDist);
-							toPrint = toPrint + ") for inputs " + i + ", " + j;
-							System.out.println(toPrint);
-						}
+					for(int k = 0; k < times.size(); k++){
+						System.out.print(k);
+						times.get(k).add(timeTestSearch(i, j, twitterUsers, searches[k]));
 					}
+					System.out.println("");
 				}
 			}
 		}
-
-		System.out.println(getStatString("Gage", gageTimes));
-		System.out.println(getStatString("Josh", joshTimes));
-		//System.out.println(getStatString("Ankita", ankitaTimes));
-
-		System.out.println("Done!");
-
+		
+		for(int i = 0; i < times.size(); i++)
+			System.out.println(getStatString(searches[i].name(), times.get(i)));
+	}
+	
+	static Integer timeTestSearch(Integer source, Integer destination, AsUnweightedDirectedGraph<Integer, DefaultEdge> twitterUsers, GraphDepthSearch<Integer> toTest){
+		int timeRec = (int) System.nanoTime();
+		toTest.distance(source, destination, twitterUsers);
+		return Integer.valueOf((int) (System.nanoTime() - timeRec));
 	}
 
 	static String getStatString(String name, LinkedList<Integer> times) {
@@ -108,7 +87,7 @@ public class CS5811TwitterDataGen {
 		nintyfifth /= 1000000000;
 		nintyninth /= 1000000000;
 
-		toReturn = name + " sort:\tMean(" + mean + "s)\tMedian(" + median
+		toReturn = name + ":\tMean(" + mean + "s)\tMedian(" + median
 				+ "s)\t";
 		toReturn += "95th percentile(" + nintyfifth + "s)\t99th percentile("
 				+ nintyninth + "s)";
