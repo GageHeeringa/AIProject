@@ -12,7 +12,7 @@ public class CS5811TwitterDataGen {
 
 		// GENERATE DATA////////////////////////////////////////////////
 
-		int numberUsers = 100;
+		int numberUsers = 1000;
 		int numberFollowingConstant = (int) Math.sqrt(numberUsers);
 
 		AsUnweightedDirectedGraph<Integer, DefaultEdge> twitterUsers;
@@ -43,23 +43,35 @@ public class CS5811TwitterDataGen {
 		for(int i = 0; i < searches.length; i++)
 			times.add(new LinkedList<Integer>());
 
-		System.out.println("Starting");
 
-		for (int i = 0; i < numberUsers; i++) {
-			for (int j = 0; j < numberUsers; j++) {
+		for (int i = 0; i < numberUsers; i++)
+			for (int j = 0; j < numberUsers; j++)
 				if (i != j) {
-
-					for(int k = 0; k < times.size(); k++){
-						System.out.print(k);
+					for(int k = 0; k < times.size(); k++) {
+						//System.out.print(k);
 						times.get(k).add(timeTestSearch(i, j, twitterUsers, searches[k]));
 					}
-					System.out.println("");
+					//System.out.println();
 				}
-			}
-		}
 		
 		for(int i = 0; i < times.size(); i++)
 			System.out.println(getStatString(searches[i].name(), times.get(i)));
+
+		System.out.println("");
+		System.out.println("");
+		System.out.println("The graph used is:");
+		System.out.println(twitterUsers.toString());
+
+		System.out.println("");
+		System.out.println("");
+		for(int i = 0; i < times.size(); i++){
+			System.out.println(searches[i].name() + " times: ");
+			for(Integer j : times.get(i)){
+				System.out.print(Double.valueOf(j/1000000000.0).toString() + "s, ");
+			}
+			System.out.println("");
+			System.out.println("");
+		}
 	}
 	
 	static Integer timeTestSearch(Integer source, Integer destination, AsUnweightedDirectedGraph<Integer, DefaultEdge> twitterUsers, GraphDepthSearch<Integer> toTest){
