@@ -27,7 +27,7 @@ public class BidirectionalBFS<VertexType> implements GraphDepthSearch<VertexType
 		endUserExplored.put(endUser, Integer.valueOf(1));
 		
 		
-		while(numSteps < userDB.vertexSet().size()){
+		while(startUserQueue.size() > 0 && endUserQueue.size() > 0){
 		    
 		    numSteps += 1;
 		    LinkedList<VertexType> nextQueue = new LinkedList<VertexType>();
