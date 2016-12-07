@@ -104,6 +104,7 @@ public class TwitterUser {
 		followers[index] = newFollower; 	
 		}
 	
+	@Override
 	public String toString() {
 		int lineCounter = 0;
 		

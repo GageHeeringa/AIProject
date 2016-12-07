@@ -18,6 +18,7 @@ public class GreedyDFS<VertexType> implements GraphDepthSearch<VertexType>{
 	/**
 	 * Given two user IDs, find their degree of separation using greedy heuristic.
 	 */
+	@Override
 	public int distance( VertexType x, VertexType y, AsUnweightedDirectedGraph<VertexType, DefaultEdge> g, Integer nodesGen[]){
 		LinkedList<VertexType> path;
 		HashSet<VertexType> touched;

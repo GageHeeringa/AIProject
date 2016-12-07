@@ -7,6 +7,7 @@ import org.jgrapht.graph.DefaultEdge;
 
 public class BidirectionalBFS<VertexType> implements GraphDepthSearch<VertexType>{
 	
+	@Override
 	public int distance(VertexType startUser, VertexType endUser, 
 				AsUnweightedDirectedGraph<VertexType, DefaultEdge> userDB, Integer nodesGen[]){
 		
