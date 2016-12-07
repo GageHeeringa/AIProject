@@ -1,6 +1,7 @@
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.Collections;
+import java.util.List;
 
 import org.jgrapht.graph.AsUnweightedDirectedGraph;
 import org.jgrapht.graph.DefaultDirectedGraph;
@@ -36,35 +37,33 @@ public class CS5811TwitterDataGen {
 
 		// TEST IMPLEMENTATION//////////////////////////////////////////
 
-		GraphDepthSearch searches[] = {new DFS<Integer>(), new BFS<Integer>(), new GreedyDFS<Integer>(),
-				new GreedyBFS<Integer>(), new BidirectionalDFS<Integer>(), new BidirectionalBFS<Integer>(),
-				new GreedyBidirectionalDFS<Integer>(), new GreedyBidirectionalBFS<Integer>()};
+		ArrayList<GraphDepthSearch<Integer>> searches;
+		searches = new ArrayList<GraphDepthSearch<Integer>>();
+		searches.add(new DFS<Integer>());
+		searches.add(new BFS<Integer>());
+		searches.add(new GreedyDFS<Integer>());
+		searches.add(new GreedyBFS<Integer>());
+		searches.add(new BidirectionalDFS<Integer>());
+		searches.add(new BidirectionalBFS<Integer>());
+		searches.add(new GreedyBidirectionalDFS<Integer>());
+		searches.add(new GreedyBidirectionalBFS<Integer>());
 
 		
-		ArrayList<LinkedList<Integer>> times = new ArrayList<LinkedList<Integer>>();
-		ArrayList<LinkedList<Integer>> nodeGenCounts = new ArrayList<LinkedList<Integer>>();
+		ArrayList<LinkedList<FoundSearchData>> results = new ArrayList<LinkedList<FoundSearchData>>();
 		
-		for(int i = 0; i < searches.length; i++){
-			times.add(new LinkedList<Integer>());
-			nodeGenCounts.add(new LinkedList<Integer>());
-		}
-			
+		for(int i = 0; i < searches.size(); i++)
+			results.add(new LinkedList<FoundSearchData>());
 
 
 		for (int i = 0; i < numberUsers; i++)
 			for (int j = 0; j < numberUsers; j++)
-				if (i != j) {
-					for(int k = 0; k < times.size(); k++) {
-						//System.out.print(k);
-						Integer[] data = timeTestSearch(i, j, twitterUsers, searches[k]);
-						times.get(k).add(data[0]); 
-						nodeGenCounts.get(k).add(data[1]);
-					}
-					//System.out.println();
-				}
+				if (i != j) 
+					for(GraphDepthSearch<Integer> algo : searches) 
+						results.get(searches.indexOf(algo)).add(timeTestSearch(i, j, twitterUsers, algo));
+					
 		
-		for(int i = 0; i < times.size(); i++)
-			System.out.println(getStatString(searches[i].name(), times.get(i), nodeGenCounts.get(i)));
+		for(int i = 0; i < results.size(); i++)
+			System.out.println(getStatString(searches.get(i).name(), results.get(i)));
 
 		System.out.println("");
 		System.out.println("");
@@ -73,113 +72,108 @@ public class CS5811TwitterDataGen {
 
 		System.out.println("");
 		System.out.println("");
-		for(int i = 0; i < times.size(); i++){
-			System.out.println(searches[i].name() + " times: ");
-			for(Integer j : times.get(i)){
-				System.out.print(Double.valueOf(j/1000000000.0).toString() + "s, ");
-			}
+		for(GraphDepthSearch<Integer> algo : searches){
+			System.out.println(algo.name() + " times(s): ");
+			for(FoundSearchData j : results.get(searches.indexOf(algo)))
+				System.out.print(Double.valueOf(j.time).toString() + ", ");
+			System.out.println("");
+			
+			System.out.println(algo.name() + " distances: ");
+			for(FoundSearchData j : results.get(searches.indexOf(algo)))
+				System.out.print(Double.valueOf(j.degreeOfSeparation).toString() + ", ");
+			System.out.println("");
+
+			System.out.println(algo.name() + " Number of Explored Nodes: ");
+			for(FoundSearchData j : results.get(searches.indexOf(algo)))
+				System.out.print(Double.valueOf(j.numberOfExploredNodes).toString() + ", ");
+			
 			System.out.println("");
 			System.out.println("");
 		}
 	}
 	
-	static Integer[] timeTestSearch(Integer source, Integer destination, AsUnweightedDirectedGraph<Integer, DefaultEdge> twitterUsers, GraphDepthSearch<Integer> toTest){
-		int timeRec = (int) System.nanoTime();
+	static FoundSearchData timeTestSearch(Integer source, Integer destination, AsUnweightedDirectedGraph<Integer, DefaultEdge> twitterUsers, GraphDepthSearch<Integer> toTest){
+		long timeRec = System.nanoTime();
 		
-		Integer nodesGen[] = new Integer[1]; // Hacky way to pass counter pointer
-		nodesGen[0] = new Integer(0);
+		FoundSearchData results = toTest.distance(source, destination, twitterUsers);
 		
-		toTest.distance(source, destination, twitterUsers, nodesGen);  // Run test
+		results.time = (System.nanoTime() - timeRec)/1000000000.0;
 		
-		// System.out.printf("NodesGen( %s ) = %s\n", toTest.name(), nodesGen[0].toString());
-		
-		Integer ret[] = new Integer[2];
-		ret[0] = Integer.valueOf((int) (System.nanoTime() - timeRec)); // Time
-		ret[1] = nodesGen[0]; // Nodes generated
-		
-		return ret;
+		return results;
 	}
 
-	static String getStatString(String name, LinkedList<Integer> times, LinkedList<Integer> nodeGenCounts) {
+	static String getStatString(String name, LinkedList<FoundSearchData> runRecords) {
 		String toReturn = "";
-		double mean, median, nintyfifth, nintyninth, nodeGenAvg;
+		LinkedList<Double> times = new LinkedList<Double>();
+		LinkedList<Integer> dist = new LinkedList<Integer>();
+		LinkedList<Integer> nExploredNodes = new LinkedList<Integer>();
+		
 
-		Collections.sort(times);
+		LinkedList<Double> timesOfNotFound = new LinkedList<Double>();
+		LinkedList<Integer> nExploredNodesOfNotFound = new LinkedList<Integer>();
+		
+		for(FoundSearchData i : runRecords){
+			if(i.degreeOfSeparation != -1){
+				times.add(i.time);
+				dist.add(i.degreeOfSeparation);
+				nExploredNodes.add(i.numberOfExploredNodes);
+			}else{
+				timesOfNotFound.add(i.time);
+				nExploredNodesOfNotFound.add(i.numberOfExploredNodes);
+			}
+		}
+
+		toReturn = statBreakDownDouble(name, "times", times) + "\n";
+		toReturn += statBreakDownInteger(name, "Distances", dist) + "\n";
+		toReturn += statBreakDownInteger(name, "Number of Explored Nodes", nExploredNodes) + "\n";
+		toReturn += statBreakDownDouble(name, "times of not found", times) + "\n";
+		toReturn += statBreakDownInteger(name, "Number of Explored Nodes of not found", nExploredNodes);
+		
+		
+
+		return toReturn;
+	}
+	
+	static String statBreakDownDouble(String name, String dataName, List<Double> rawData){
+		double mean, median, nintyFifth, nintyNinth;
+		String toReturn;
+		
+		Collections.sort(rawData);
 
 		mean = 0;
-		for (Integer i : times)	mean += i;
-		mean /= times.size();
-		
-		nodeGenAvg = 0; // Nodes generated avg
-		for (Integer i : nodeGenCounts)	nodeGenAvg += i; 
-		nodeGenAvg /= nodeGenCounts.size();
-		
+		for (Double i : rawData)	mean += i;
+		mean /= rawData.size();
 
-		median = times.get((int) (times.size() * .5));
-		nintyfifth = times.get((int) (times.size() * .95));
-		nintyninth = times.get((int) (times.size() * .99));
+		median = rawData.get((int) (rawData.size() * .5));
+		nintyFifth = rawData.get((int) (rawData.size() * .95));
+		nintyNinth = rawData.get((int) (rawData.size() * .99));
+
+		toReturn = name + "'s " + dataName + ":\tMean(" + mean + ")\tMedian("; 
+		toReturn += median + ")\t" + "95th percentile(" + nintyFifth;
+		toReturn += ")\t99th percentile(" + nintyNinth + ")";
 		
-		mean /= 1000000000;
-		median /= 1000000000;
-		nintyfifth /= 1000000000;
-		nintyninth /= 1000000000;
+		return toReturn;
+	}
+	
+	static String statBreakDownInteger(String name, String dataName, List<Integer> rawData){
+		double mean, median, nintyFifth, nintyNinth;
+		String toReturn;
+		
+		Collections.sort(rawData);
 
-		toReturn = name + ":\tMean(" + mean + "s)\tMedian(" + median
-				+ "s)\t";
-		toReturn += "95th percentile(" + nintyfifth + "s)\t99th percentile("
-				+ nintyninth + "s)";
-		toReturn += "\n" + name + ":\tNodes_Generated_Mean(" + nodeGenAvg + " nodes)";
+		mean = 0;
+		for (Integer i : rawData)	mean += i;
+		mean /= rawData.size();
 
+		median = rawData.get((int) (rawData.size() * .5));
+		nintyFifth = rawData.get((int) (rawData.size() * .95));
+		nintyNinth = rawData.get((int) (rawData.size() * .99));
+
+		toReturn = name + "'s " + dataName + ":\tMean(" + mean + ")\tMedian("; 
+		toReturn += median + ")\t" + "95th percentile(" + nintyFifth;
+		toReturn += ")\t99th percentile(" + nintyNinth + ")";
+		
 		return toReturn;
 	}
 
 }
-
-/*----OLD METHOD DESIGN BEFORE OBJECT ORIENTED DESIGN----*/
-/* BUILD FOLLOWER LIST METHOD */
-/*
- * public int[] buildFollowerList (int id, int numFollowers){
- * 
- * int newFollower = 0; boolean invalidFollow = false; int currentNumFollowers =
- * 0; int [] followers = new int [numFollowers];
- * 
- * for (int i = 0; i < numFollowers; i = i + 1){ do { invalidFollow = false;
- * newFollower = (int)(Math.random() * 317000000); if (newFollower == id){
- * invalidFollow = true; continue; } for (int j = 0; j <= currentNumFollowers; j
- * = j +1){ if (newFollower == followers[j]) { invalidFollow = true; break; } }
- * } while (invalidFollow == true);
- * 
- * followers[i] = newFollower; currentNumFollowers = currentNumFollowers + 1; }
- * 
- * return followers; }
- */
-/* CREATE RANDOM ID METHOD */
-/*
- * public int createRandomID() {
- * 
- * int id = (int)(Math.random() * 317000000); //last reported Twitter average
- * users in 2016
- * 
- * return id; }
- */
-/* CREATE RANDOM NUMBER OF FOLLOWERS METHOD */
-/*
- * public int createRandomNumberOfFollowers() {
- * 
- * int numFollowers = (int)(Math.random() * 700); //average followers is 208
- * 
- * return numFollowers; }
- */
-/* PRINT USER DATA METHOD */
-/*
- * public void printUserData(int id, int[] followers, int numFollowers) {
- * 
- * int lineCounter = 0;
- * 
- * System.out.println("The user's Twitter ID is: " + id);
- * System.out.println("The number of followers for the user is: " +
- * numFollowers); System.out.println("The follower IDs are: "); for (int i = 0;
- * i < numFollowers; i = i + 1){ System.out.print(followers[i] + " ");
- * lineCounter = lineCounter + 1; if (lineCounter == 10){
- * System.out.println(" "); lineCounter = 0; } } }
- */

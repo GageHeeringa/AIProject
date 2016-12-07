@@ -8,11 +8,11 @@ import org.jgrapht.graph.DefaultEdge;
 public class BidirectionalBFS<VertexType> implements GraphDepthSearch<VertexType>{
 	
 	@Override
-	public int distance(VertexType startUser, VertexType endUser, 
-				AsUnweightedDirectedGraph<VertexType, DefaultEdge> userDB, Integer nodesGen[]){
+	public FoundSearchData distance(VertexType startUser, VertexType endUser, 
+				AsUnweightedDirectedGraph<VertexType, DefaultEdge> userDB){
 		
 		int numSteps = 0;
-		if(startUser == endUser) return numSteps;
+		if(startUser == endUser) return new FoundSearchData(0, 0);
 
 		Hashtable<VertexType, Integer> startUserExplored = new Hashtable<VertexType, Integer>();
 		Hashtable<VertexType, Integer> endUserExplored = new Hashtable<VertexType, Integer>();
@@ -36,8 +36,7 @@ public class BidirectionalBFS<VertexType> implements GraphDepthSearch<VertexType
 		    while(startUserQueue.size() > 0){
 		    	VertexType expand = startUserQueue.removeFirst();
 		    	if(endUserExplored.containsKey(expand)){
-		    		nodesGen[0] = startUserExplored.size() + endUserExplored.size();
-		    		return numSteps;
+		    		return new FoundSearchData(numSteps, startUserExplored.size() + endUserExplored.size());
 		    	}
 		    	for(DefaultEdge toFollowEdge : userDB.outgoingEdgesOf(expand)){
 		    		VertexType toFollow = userDB.getEdgeTarget(toFollowEdge);
@@ -57,8 +56,7 @@ public class BidirectionalBFS<VertexType> implements GraphDepthSearch<VertexType
 		    while(endUserQueue.size() > 0){
 		    	VertexType expand = endUserQueue.removeFirst();
 		    	if(startUserExplored.containsKey(expand)){
-		    		nodesGen[0] = startUserExplored.size() + endUserExplored.size();
-		    		return numSteps;
+		    		return new FoundSearchData(numSteps, startUserExplored.size() + endUserExplored.size());
 		    	}
 		    	for(DefaultEdge toFollowEdge : userDB.incomingEdgesOf(expand)){
 		    		VertexType toFollow = userDB.getEdgeSource(toFollowEdge);
@@ -71,8 +69,7 @@ public class BidirectionalBFS<VertexType> implements GraphDepthSearch<VertexType
 		    endUserQueue = nextQueue;
 		}
 		
-		nodesGen[0] = startUserExplored.size() + endUserExplored.size();
-		return -1;
+		return new FoundSearchData(-1, startUserExplored.size() + endUserExplored.size());
 	}
 
 	@Override

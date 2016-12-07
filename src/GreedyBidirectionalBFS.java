@@ -10,11 +10,11 @@ import org.jgrapht.graph.DefaultEdge;
 public class GreedyBidirectionalBFS<VertexType> implements GraphDepthSearch<VertexType> {
 
 	@Override
-	public int distance(VertexType source, VertexType destination,
-			AsUnweightedDirectedGraph<VertexType, DefaultEdge> graph, Integer nodesGen[]) {
+	public FoundSearchData distance(VertexType source, VertexType destination,
+			AsUnweightedDirectedGraph<VertexType, DefaultEdge> graph) {
 
 		int numSteps;
-		if(source == destination) return 0;
+		if(source == destination) return new FoundSearchData(0, 0);
 		numSteps = 0;
 
 		Hashtable<VertexType, Integer> sourceUserExplored = new Hashtable<VertexType, Integer>();
@@ -39,16 +39,11 @@ public class GreedyBidirectionalBFS<VertexType> implements GraphDepthSearch<Vert
 		    
 		    while(sourceUserQueue.size() > 0){
 		    	VertexType expand = sourceUserQueue.removeFirst().getKey();
-		    	if(destination == expand){
-		    		nodesGen[0] = sourceUserExplored.size() + endUserExplored.size();
-		    		return numSteps;
-		    	}
+		    	
 		    	for(DefaultEdge toFollowEdge : graph.outgoingEdgesOf(expand)){
 		    		VertexType toFollow = graph.getEdgeTarget(toFollowEdge);
-		    		if(endUserExplored.contains(toFollow)){
-		    			nodesGen[0] = sourceUserExplored.size() + endUserExplored.size();
-		    			return numSteps;
-		    		}
+		    		if(endUserExplored.contains(toFollow))
+		    			return new FoundSearchData(numSteps, sourceUserExplored.size() + endUserExplored.size());
 		    			
 		   			if(!sourceUserExplored.containsKey(toFollow)){
 			    		sourceUserExplored.put(toFollow, Integer.valueOf(1));
@@ -72,10 +67,9 @@ public class GreedyBidirectionalBFS<VertexType> implements GraphDepthSearch<Vert
 		    	VertexType expand = endUserQueue.removeFirst().getKey();
 		    	for(DefaultEdge toFollowEdge : graph.incomingEdgesOf(expand)){
 		    		VertexType toFollow = graph.getEdgeSource(toFollowEdge);
-		    		if(sourceUserExplored.contains(toFollow)){
-		    			nodesGen[0] = sourceUserExplored.size() + endUserExplored.size();
-		    			return numSteps;
-		    		}
+		    		if(sourceUserExplored.contains(toFollow))
+		    			return new FoundSearchData(numSteps, sourceUserExplored.size() + endUserExplored.size());
+		   
 		   			if(!endUserExplored.containsKey(toFollow)){
 			    		endUserExplored.put(toFollow, Integer.valueOf(1));
 			    		SimpleEntry<VertexType, Integer> tmp;
@@ -91,8 +85,7 @@ public class GreedyBidirectionalBFS<VertexType> implements GraphDepthSearch<Vert
 			
 		}
 		
-		nodesGen[0] = sourceUserExplored.size() + endUserExplored.size();
-		return -1;
+		return new FoundSearchData(-1, sourceUserExplored.size() + endUserExplored.size());
 	}
 
 	@Override

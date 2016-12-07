@@ -8,11 +8,14 @@ import org.jgrapht.graph.DefaultEdge;
 public class BFS<VertexType> implements GraphDepthSearch<VertexType> {
 
 	@Override
-	public int distance(VertexType source, VertexType destination,
-			AsUnweightedDirectedGraph<VertexType, DefaultEdge> graph, Integer nodesGen[]) {
+	public FoundSearchData distance(VertexType source, VertexType destination,
+			AsUnweightedDirectedGraph<VertexType, DefaultEdge> graph) {
 
 		int numSteps = 0;
-		if(source == destination) return numSteps;
+		
+		if(source == destination){
+			return new FoundSearchData(0, 0);
+		}
 
 		Hashtable<VertexType, Integer> startUserExplored = new Hashtable<VertexType, Integer>();
 		
@@ -34,8 +37,7 @@ public class BFS<VertexType> implements GraphDepthSearch<VertexType> {
 		    		VertexType toFollow = graph.getEdgeTarget(toFollowEdge);
 		   			if(!startUserExplored.containsKey(toFollow)){
 		   				if(toFollow == destination){
-		   					nodesGen[0] = startUserExplored.size();
-		   					return numSteps + 1;
+		   					return new FoundSearchData(numSteps + 1, startUserExplored.size());
 		   				}
 			    		startUserExplored.put(toFollow, Integer.valueOf(1));
 	    				nextQueue.add(toFollow);
@@ -46,8 +48,7 @@ public class BFS<VertexType> implements GraphDepthSearch<VertexType> {
 		    startUserQueue = nextQueue;
 		}
 		
-		nodesGen[0] = startUserExplored.size();
-		return -1;
+		return new FoundSearchData(-1, startUserExplored.size());
 	}
 
 	@Override
