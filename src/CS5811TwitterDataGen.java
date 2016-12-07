@@ -12,7 +12,8 @@ public class CS5811TwitterDataGen {
 
 		// GENERATE DATA////////////////////////////////////////////////
 
-		int numberUsers = 1000;
+		//int numberUsers = 1000;
+		int numberUsers = 15;
 		int numberFollowingConstant = (int) Math.sqrt(numberUsers);
 
 		AsUnweightedDirectedGraph<Integer, DefaultEdge> twitterUsers;
@@ -39,9 +40,15 @@ public class CS5811TwitterDataGen {
 				new GreedyBFS<Integer>(), new BidirectionalDFS<Integer>(), new BidirectionalBFS<Integer>(),
 				new GreedyBidirectionalDFS<Integer>(), new GreedyBidirectionalBFS<Integer>()};
 
+		
 		ArrayList<LinkedList<Integer>> times = new ArrayList<LinkedList<Integer>>();
-		for(int i = 0; i < searches.length; i++)
+		ArrayList<LinkedList<Integer>> nodeGenCounts = new ArrayList<LinkedList<Integer>>();
+		
+		for(int i = 0; i < searches.length; i++){
 			times.add(new LinkedList<Integer>());
+			nodeGenCounts.add(new LinkedList<Integer>());
+		}
+			
 
 
 		for (int i = 0; i < numberUsers; i++)
@@ -49,13 +56,15 @@ public class CS5811TwitterDataGen {
 				if (i != j) {
 					for(int k = 0; k < times.size(); k++) {
 						//System.out.print(k);
-						times.get(k).add(timeTestSearch(i, j, twitterUsers, searches[k]));
+						Integer[] data = timeTestSearch(i, j, twitterUsers, searches[k]);
+						times.get(k).add(data[0]); 
+						nodeGenCounts.get(k).add(data[1]);
 					}
 					//System.out.println();
 				}
 		
 		for(int i = 0; i < times.size(); i++)
-			System.out.println(getStatString(searches[i].name(), times.get(i)));
+			System.out.println(getStatString(searches[i].name(), times.get(i), nodeGenCounts.get(i)));
 
 		System.out.println("");
 		System.out.println("");
@@ -74,21 +83,37 @@ public class CS5811TwitterDataGen {
 		}
 	}
 	
-	static Integer timeTestSearch(Integer source, Integer destination, AsUnweightedDirectedGraph<Integer, DefaultEdge> twitterUsers, GraphDepthSearch<Integer> toTest){
+	static Integer[] timeTestSearch(Integer source, Integer destination, AsUnweightedDirectedGraph<Integer, DefaultEdge> twitterUsers, GraphDepthSearch<Integer> toTest){
 		int timeRec = (int) System.nanoTime();
-		toTest.distance(source, destination, twitterUsers);
-		return Integer.valueOf((int) (System.nanoTime() - timeRec));
+		
+		Integer nodesGen[] = new Integer[1]; // Hacky way to pass counter pointer
+		nodesGen[0] = new Integer(0);
+		
+		toTest.distance(source, destination, twitterUsers, nodesGen);  // Run test
+		
+		// System.out.printf("NodesGen( %s ) = %s\n", toTest.name(), nodesGen[0].toString());
+		
+		Integer ret[] = new Integer[2];
+		ret[0] = Integer.valueOf((int) (System.nanoTime() - timeRec)); // Time
+		ret[1] = nodesGen[0]; // Nodes generated
+		
+		return ret;
 	}
 
-	static String getStatString(String name, LinkedList<Integer> times) {
+	static String getStatString(String name, LinkedList<Integer> times, LinkedList<Integer> nodeGenCounts) {
 		String toReturn = "";
-		double mean, median, nintyfifth, nintyninth;
+		double mean, median, nintyfifth, nintyninth, nodeGenAvg;
 
 		Collections.sort(times);
 
 		mean = 0;
 		for (Integer i : times)	mean += i;
 		mean /= times.size();
+		
+		nodeGenAvg = 0; // Nodes generated avg
+		for (Integer i : nodeGenCounts)	nodeGenAvg += i; 
+		nodeGenAvg /= nodeGenCounts.size();
+		
 
 		median = times.get((int) (times.size() * .5));
 		nintyfifth = times.get((int) (times.size() * .95));
@@ -103,6 +128,7 @@ public class CS5811TwitterDataGen {
 				+ "s)\t";
 		toReturn += "95th percentile(" + nintyfifth + "s)\t99th percentile("
 				+ nintyninth + "s)";
+		toReturn += "\n" + name + ":\tNodes_Generated_Mean(" + nodeGenAvg + " nodes)";
 
 		return toReturn;
 	}

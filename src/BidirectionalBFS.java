@@ -8,7 +8,7 @@ import org.jgrapht.graph.DefaultEdge;
 public class BidirectionalBFS<VertexType> implements GraphDepthSearch<VertexType>{
 	
 	public int distance(VertexType startUser, VertexType endUser, 
-				AsUnweightedDirectedGraph<VertexType, DefaultEdge> userDB){
+				AsUnweightedDirectedGraph<VertexType, DefaultEdge> userDB, Integer nodesGen[]){
 		
 		int numSteps = 0;
 		if(startUser == endUser) return numSteps;
@@ -35,6 +35,7 @@ public class BidirectionalBFS<VertexType> implements GraphDepthSearch<VertexType
 		    while(startUserQueue.size() > 0){
 		    	VertexType expand = startUserQueue.removeFirst();
 		    	if(endUserExplored.containsKey(expand)){
+		    		nodesGen[0] = startUserExplored.size() + endUserExplored.size();
 		    		return numSteps;
 		    	}
 		    	for(DefaultEdge toFollowEdge : userDB.outgoingEdgesOf(expand)){
@@ -55,6 +56,7 @@ public class BidirectionalBFS<VertexType> implements GraphDepthSearch<VertexType
 		    while(endUserQueue.size() > 0){
 		    	VertexType expand = endUserQueue.removeFirst();
 		    	if(startUserExplored.containsKey(expand)){
+		    		nodesGen[0] = startUserExplored.size() + endUserExplored.size();
 		    		return numSteps;
 		    	}
 		    	for(DefaultEdge toFollowEdge : userDB.incomingEdgesOf(expand)){
@@ -68,6 +70,7 @@ public class BidirectionalBFS<VertexType> implements GraphDepthSearch<VertexType
 		    endUserQueue = nextQueue;
 		}
 		
+		nodesGen[0] = startUserExplored.size() + endUserExplored.size();
 		return -1;
 	}
 

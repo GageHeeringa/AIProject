@@ -9,7 +9,7 @@ public class BidirectionalDFS<VertexType> implements GraphDepthSearch<VertexType
 
 	@Override
 	public int distance(VertexType source, VertexType destination,
-			AsUnweightedDirectedGraph<VertexType, DefaultEdge> graph) {
+			AsUnweightedDirectedGraph<VertexType, DefaultEdge> graph, Integer nodesGen[]) {
 		LinkedList<VertexType> pathFromSource;
 		HashSet<VertexType> touchedFromSource;
 		LinkedList<VertexType> pathFromDest;
@@ -32,8 +32,11 @@ public class BidirectionalDFS<VertexType> implements GraphDepthSearch<VertexType
 			for(DefaultEdge edge : graph.outgoingEdgesOf(idFromSource)){
 				VertexType v = graph.getEdgeTarget(edge);
 				if(!touchedFromSource.contains(v)){
-					if(touchedFromDest.contains(v))
+					if(touchedFromDest.contains(v)){
+						nodesGen[0] = touchedFromSource.size() + touchedFromDest.size();
 						return pathFromSource.size() + pathFromDest.size() + 1;
+					}
+						
 					idFromSource = v;
 					found = true;
 					break;
@@ -46,6 +49,7 @@ public class BidirectionalDFS<VertexType> implements GraphDepthSearch<VertexType
 			}else if(!pathFromSource.isEmpty()){
 				idFromSource = pathFromSource.removeLast();
 			}else{
+				nodesGen[0] = touchedFromSource.size() + touchedFromDest.size();
 				return -1;
 			}
 			
@@ -55,8 +59,11 @@ public class BidirectionalDFS<VertexType> implements GraphDepthSearch<VertexType
 			for(DefaultEdge edge : graph.incomingEdgesOf(idFromDest)){
 				VertexType v = graph.getEdgeSource(edge);
 				if(!touchedFromDest.contains(v)){
-					if(touchedFromSource.contains(v))
+					if(touchedFromSource.contains(v)){
+						nodesGen[0] = touchedFromSource.size() + touchedFromDest.size();
 						return pathFromSource.size() + pathFromDest.size() + 1;
+					}
+						
 					idFromDest = v;
 					found = true;
 					break;
@@ -70,6 +77,7 @@ public class BidirectionalDFS<VertexType> implements GraphDepthSearch<VertexType
 				idFromDest = pathFromDest.removeLast();
 				continue;
 			}else{
+				nodesGen[0] = touchedFromSource.size() + touchedFromDest.size();
 				return -1;
 			}
 		}
