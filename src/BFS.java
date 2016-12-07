@@ -9,7 +9,7 @@ public class BFS<VertexType> implements GraphDepthSearch<VertexType> {
 
 	@Override
 	public int distance(VertexType source, VertexType destination,
-			AsUnweightedDirectedGraph<VertexType, DefaultEdge> graph) {
+			AsUnweightedDirectedGraph<VertexType, DefaultEdge> graph, Integer nodesGen[]) {
 
 		int numSteps = 0;
 		if(source == destination) return numSteps;
@@ -33,8 +33,10 @@ public class BFS<VertexType> implements GraphDepthSearch<VertexType> {
 		    	for(DefaultEdge toFollowEdge : graph.outgoingEdgesOf(expand)){
 		    		VertexType toFollow = graph.getEdgeTarget(toFollowEdge);
 		   			if(!startUserExplored.containsKey(toFollow)){
-		   				if(toFollow == destination)
+		   				if(toFollow == destination){
+		   					nodesGen[0] = startUserExplored.size();
 		   					return numSteps + 1;
+		   				}
 			    		startUserExplored.put(toFollow, Integer.valueOf(1));
 	    				nextQueue.add(toFollow);
 	    			}
@@ -44,6 +46,7 @@ public class BFS<VertexType> implements GraphDepthSearch<VertexType> {
 		    startUserQueue = nextQueue;
 		}
 		
+		nodesGen[0] = startUserExplored.size();
 		return -1;
 	}
 

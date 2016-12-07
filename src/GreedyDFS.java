@@ -18,7 +18,7 @@ public class GreedyDFS<VertexType> implements GraphDepthSearch<VertexType>{
 	/**
 	 * Given two user IDs, find their degree of separation using greedy heuristic.
 	 */
-	public int distance( VertexType x, VertexType y, AsUnweightedDirectedGraph<VertexType, DefaultEdge> g){
+	public int distance( VertexType x, VertexType y, AsUnweightedDirectedGraph<VertexType, DefaultEdge> g, Integer nodesGen[]){
 		LinkedList<VertexType> path;
 		HashSet<VertexType> touched;
 		
@@ -42,8 +42,11 @@ public class GreedyDFS<VertexType> implements GraphDepthSearch<VertexType>{
 				}
 			}
 
-			if( following.contains(y) )
+			if( following.contains(y) ){
+				nodesGen[0] = touched.size();
 				return path.size()+1;
+			}
+				
 
 			// Greedy heuristic ( max # followings )
 			max = -1;
@@ -63,6 +66,7 @@ public class GreedyDFS<VertexType> implements GraphDepthSearch<VertexType>{
 				id = path.removeLast();
 				continue;
 			}else{
+				nodesGen[0] = touched.size();
 				return -1;
 			}
 		}

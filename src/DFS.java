@@ -6,12 +6,14 @@ import org.jgrapht.graph.DefaultEdge;
 
 
 public class DFS<VertexType> implements GraphDepthSearch<VertexType> {
-
+	
 	@Override
 	public int distance(VertexType source, VertexType destination,
-			AsUnweightedDirectedGraph<VertexType, DefaultEdge> graph) {
+			AsUnweightedDirectedGraph<VertexType, DefaultEdge> graph, Integer nodesGen[]) {
 		LinkedList<VertexType> path;
 		HashSet<VertexType> touched;
+		
+		
 		
 		if(source.equals(destination))
 			return 0;
@@ -27,8 +29,11 @@ public class DFS<VertexType> implements GraphDepthSearch<VertexType> {
 			for(DefaultEdge edge : graph.outgoingEdgesOf(id)){
 				VertexType v = graph.getEdgeTarget(edge);
 				if(!touched.contains(v)){
-					if(v == destination)
+					if(v == destination){
+						nodesGen[0] = touched.size();
 						return path.size()+1;
+					}
+						
 					id = v;
 					nextFound = true;
 					break;
@@ -43,9 +48,9 @@ public class DFS<VertexType> implements GraphDepthSearch<VertexType> {
 			}else if(id == null && !path.isEmpty()){
 				id = path.removeLast();
 			}else{
+				nodesGen[0] = touched.size();
 				return -1;
 			}
-			
 		}
 	}
 

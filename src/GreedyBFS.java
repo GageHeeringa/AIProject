@@ -11,7 +11,7 @@ public class GreedyBFS<VertexType> implements GraphDepthSearch<VertexType> {
 
 	@Override
 	public int distance(VertexType source, VertexType destination,
-			AsUnweightedDirectedGraph<VertexType, DefaultEdge> graph) {
+			AsUnweightedDirectedGraph<VertexType, DefaultEdge> graph, Integer nodesGen[]) {
 
 		int numSteps = 0;
 		if(source == destination) return numSteps;
@@ -34,6 +34,7 @@ public class GreedyBFS<VertexType> implements GraphDepthSearch<VertexType> {
 		    while(userQueue.size() > 0){
 		    	VertexType expand = userQueue.removeFirst().getKey();
 		    	if(destination == expand){
+		    		nodesGen[0] = userExplored.size();
 		    		return numSteps;
 		    	}
 		    	for(DefaultEdge toFollowEdge : graph.outgoingEdgesOf(expand)){
@@ -53,6 +54,7 @@ public class GreedyBFS<VertexType> implements GraphDepthSearch<VertexType> {
 			
 		}
 		
+		nodesGen[0] = userExplored.size();
 		return -1;
 	}
 
