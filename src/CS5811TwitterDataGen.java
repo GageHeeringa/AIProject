@@ -14,7 +14,7 @@ public class CS5811TwitterDataGen {
 		// GENERATE DATA////////////////////////////////////////////////
 
 		//int numberUsers = 1000;
-		int numberUsers = 15;
+		int numberUsers = 1000;
 		int numberFollowingConstant = (int) Math.sqrt(numberUsers);
 
 		AsUnweightedDirectedGraph<Integer, DefaultEdge> twitterUsers;
@@ -48,9 +48,12 @@ public class CS5811TwitterDataGen {
 		searches.add(new GreedyBidirectionalDFS<Integer>());
 		searches.add(new GreedyBidirectionalBFS<Integer>());
 
-		
+
+		ArrayList<LinkedList<MultithreadingWrapper<Integer>>> threads = new ArrayList<LinkedList<MultithreadingWrapper<Integer>>>();
 		ArrayList<LinkedList<FoundSearchData>> results = new ArrayList<LinkedList<FoundSearchData>>();
-		
+
+		for(int i = 0; i < searches.size(); i++)
+			threads.add(new LinkedList<MultithreadingWrapper<Integer>>());
 		for(int i = 0; i < searches.size(); i++)
 			results.add(new LinkedList<FoundSearchData>());
 
@@ -59,8 +62,19 @@ public class CS5811TwitterDataGen {
 			for (int j = 0; j < numberUsers; j++)
 				if (i != j) 
 					for(GraphDepthSearch<Integer> algo : searches) 
-						results.get(searches.indexOf(algo)).add(timeTestSearch(i, j, twitterUsers, algo));
-					
+						threads.get(searches.indexOf(algo)).add(new MultithreadingWrapper<Integer>(i, j, twitterUsers, algo));
+
+		for(LinkedList<MultithreadingWrapper<Integer>> algo : threads)
+			for(MultithreadingWrapper<Integer> toRun : algo)
+				toRun.start();
+		
+		for(LinkedList<MultithreadingWrapper<Integer>> algo : threads)
+			for(MultithreadingWrapper<Integer> toFinish : algo)
+				toFinish.join();
+		
+		for(LinkedList<MultithreadingWrapper<Integer>> i : threads)
+			for(MultithreadingWrapper<Integer> runContainer : i)
+				results.get(threads.indexOf(i)).add(runContainer.results);
 		
 		for(int i = 0; i < results.size(); i++)
 			System.out.println(getStatString(searches.get(i).name(), results.get(i)));
@@ -92,15 +106,6 @@ public class CS5811TwitterDataGen {
 		}
 	}
 	
-	static FoundSearchData timeTestSearch(Integer source, Integer destination, AsUnweightedDirectedGraph<Integer, DefaultEdge> twitterUsers, GraphDepthSearch<Integer> toTest){
-		long timeRec = System.nanoTime();
-		
-		FoundSearchData results = toTest.distance(source, destination, twitterUsers);
-		
-		results.time = (System.nanoTime() - timeRec)/1000000000.0;
-		
-		return results;
-	}
 
 	static String getStatString(String name, LinkedList<FoundSearchData> runRecords) {
 		String toReturn = "";
